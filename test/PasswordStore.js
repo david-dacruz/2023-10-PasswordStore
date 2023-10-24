@@ -8,7 +8,7 @@ describe('PasswordStore', function () {
 	let addr1; // Another account used in the tests, possibly representing an attacker.
 
 	// Setup hook that runs before each test case.
-  beforeEach(async function () {
+	beforeEach(async function () {
 		// Create a new instance of the PasswordStore contract for each test.
 		const PasswordStore = await ethers.getContractFactory('PasswordStore');
 		passwordStore = await PasswordStore.deploy();
@@ -18,8 +18,7 @@ describe('PasswordStore', function () {
 
 	describe('Attacker', function () {
 		it('Can access s_password private storage variable', async function () {
-			
-      // Set the password first
+			// Set the password first
 			const secretPassword = 'mySecretPassword';
 			await passwordStore.connect(owner).setPassword(secretPassword);
 
@@ -39,29 +38,24 @@ describe('PasswordStore', function () {
 				const stringData = hexToString(passwordBytes.slice(0, 34));
 
 				// Check if the decoded password matches the one we set.
-        expect(stringData).to.equal(secretPassword);
-        
+				expect(stringData).to.equal(secretPassword);
 			} catch (rpcErr) {
 				console.error('Error using RPC method:', rpcErr);
 			}
 		});
 
-    it('Can call the setPassword method and change s_password', async function () {
-      
+		it('Can call the setPassword method and change s_password', async function () {
 			// Try to set a new password using addr1 (not the original owner).
 			const pwnedPassword = 'pwned';
 			await passwordStore.connect(addr1).setPassword(pwnedPassword);
-
-      try {
-        
+			try {
 				// Retrieve the password using the owner's account.
 				const password = await passwordStore
 					.connect(owner)
-          .getPassword();
-        
+					.getPassword();
+
 				// Assert that the retrieved password is the one set by addr1.
-        expect(password).to.equal(pwnedPassword);
-        
+				expect(password).to.equal(pwnedPassword);
 			} catch (error) {
 				console.error('Error:', error);
 			}
